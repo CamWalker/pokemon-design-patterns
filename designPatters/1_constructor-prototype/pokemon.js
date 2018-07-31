@@ -33,8 +33,7 @@ class Pokemon {
   }
   
   async learn(attackId) {
-    return axios.get(`http://pokeapi.co/api/v2/move/${attackId}/`).then(data => {
-      const attack = data.data;
+    return axios.get(`http://pokeapi.co/api/v2/move/${attackId}/`).then(attack => {
       if (attack.type.name === 'normal' || attack.type.name === this.type) {
         this.attacks[attackId] = new Attack(attack);
         console.log(`${this.name} learned ${attack.name}.`)
@@ -76,8 +75,7 @@ class Pokemon {
 // }
 
 // Pokemon.prototype.learn = async function(attackId) {
-//   return axios.get(`http://pokeapi.co/api/v2/move/${attackId}/`).then(data => {
-//     const attack = data.data;
+//   return axios.get(`http://pokeapi.co/api/v2/move/${attackId}/`).then(attack => {
 //     if (attack.type.name === 'normal' || attack.type.name === this.type) {
 //       this.attacks[attackId] = new Attack(attack);
 //       console.log(`${this.name} learned ${attack.name}.`)
