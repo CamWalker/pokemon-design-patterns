@@ -1,6 +1,5 @@
 const _ = require('lodash');
-const service = require('./pokeApi.service.js');
-const PokeApi = new service();
+const PokeApi = require('./pokeApi.service.js');
 
 class Attack {
   constructor(data) {
@@ -11,43 +10,40 @@ class Attack {
 }
 
 class Pokemon {
-  constructor(data) {
+  constructor(id) {
     this.level = 1;
-    this.id = data.id;
-    // this.id = id;
-    this.name = data.name;
-    this.type = data.types[0].type.name;
-    this.levelUpMoves = {};
+    this.id = id;
+    // this.levelUpMoves = {};
     this.attacks = {};
   }
 
-  // async create() {
-  //   const data = await PokeApi.getPokemon(this.id);
-  //   this.name = data.name;
-  //   this.type = data.types[0].type.name;
+  async create() {
+    const data = await PokeApi.getPokemon(this.id);
+    this.name = data.name;
+    this.type = data.types[0].type.name;
 
-  //   const calls = []
+    const calls = [];
 
-  //   _.forEach(
-  //     _.filter(data.moves, move => _.find(move.version_group_details, version => version.version_group.name === 'yellow' && version.move_learn_method.name === 'level-up')),
-  //     move => {
-  //       const version = _.find(move.version_group_details, version => {
-  //         return version.version_group.name === 'yellow' && version.move_learn_method.name === 'level-up';
-  //       })
-  //       if (version.level_learned_at === 1) {
-  //         calls.push(this.learn(_.replace(_.replace(move.move.url, 'https://pokeapi.co/api/v2/move/', ''), '/','')));
-  //       }
-  //       // if (_.isEmpty(this.levelUpMoves[version.level_learned_at])) {
-  //       //   this.levelUpMoves[version.level_learned_at] = [move.move.url] 
-  //       // } else {
-  //       //   this.levelUpMoves[version.level_learned_at].push(move.move.url)
-  //       // }
-  //     },
-  //   );
+    _.forEach(
+      _.filter(data.moves, move => _.find(move.version_group_details, version => version.version_group.name === 'yellow' && version.move_learn_method.name === 'level-up')),
+      move => {
+        const version = _.find(move.version_group_details, version => {
+          return version.version_group.name === 'yellow' && version.move_learn_method.name === 'level-up';
+        })
+        if (version.level_learned_at === 1) {
+          calls.push(this.learn(_.replace(_.replace(move.move.url, 'https://pokeapi.co/api/v2/move/', ''), '/','')));
+        }
+        // if (_.isEmpty(this.levelUpMoves[version.level_learned_at])) {
+        //   this.levelUpMoves[version.level_learned_at] = [move.move.url] 
+        // } else {
+        //   this.levelUpMoves[version.level_learned_at].push(move.move.url)
+        // }
+      },
+    );
 
-  //   console.log(`I caught a ${this.name}!`);
-  //   return Promise.all(calls).then(() => this)
-  // }
+    console.log(`I caught a ${this.name}!`);
+    return Promise.all(calls).then(() => this)
+  }
 
   useAttack(attackId) {
     const attack = this.attacks[attackId]
