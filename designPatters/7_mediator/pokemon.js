@@ -1,5 +1,6 @@
 const _ = require('lodash');
-const PokeApi = require('../7_mediator/pokeApi.service.js');
+const PokeApi = require('../6_observer/pokeApi.service.js');
+const fightMediator = require('./fightMediator');
 
 class Attack {
   constructor(data) {
@@ -25,7 +26,7 @@ class Pokemon {
     // this.levelUpMoves = {};
     this.attacks = {};
     this.pranks = {};
-    this.attackObservers = [];
+    // this.attackObservers = [];
   }
 
   async create() {
@@ -66,9 +67,10 @@ class Pokemon {
         
         ${attack.type === this.type ? "It's super effective!" : ''}
       `);
-      _.forEach(this.attackObservers, (pokemon) => {
-        pokemon.receiveAttack(attack, this);
-      })
+      // _.forEach(this.attackObservers, (pokemon) => {
+      //   pokemon.receiveAttack(attack, this);
+      // })
+      fightMediator.useAttack(attack, this.name);
     } else {
       console.log(`
         "${this.name}?"
@@ -120,27 +122,26 @@ class Pokemon {
     }
   }
 
-  fight(pokemon) {
-    this.attackObservers.push(pokemon);
-    console.log(`${this.name} is fighting ${pokemon.name}`);
-  }
+  // fight(pokemon) {
+  //   this.attackObservers.push(pokemon);
+  //   console.log(`${this.name} is fighting ${pokemon.name}`);
+  // }
 
-  removeAttackObserver(pokemon) {
-    this.attackObservers = _.filter(this.attackObservers, pokemonObserver => {
-      return pokemonObserver.id !== pokemon.id;
-    })
-    console.log(`${this.name} has stopped fighting ${pokemon.name}`);
-  }
+  // removeAttackObserver(pokemon) {
+  //   this.attackObservers = _.filter(this.attackObservers, pokemonObserver => {
+  //     return pokemonObserver.id !== pokemon.id;
+  //   })
+  //   console.log(`${this.name} has stopped fighting ${pokemon.name}`);
+  // }
 
-  receiveAttack(attack, pokemon) {
+  receiveAttack(attack) {
     // lose hp
     if (attack.power) {
       this.hp -= attack.power;
       console.log(`${this.name} received ${attack.power} damage`);
     }
     if (this.hp <= 0) {
-      console.log(`${this.name} is unable to battle, ${pokemon.name} wins!`);
-      pokemon.removeAttackObserver(this);
+      fightMediator.stopFighting(this.name)
     }
   }
 }
