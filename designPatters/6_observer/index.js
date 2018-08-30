@@ -13,7 +13,6 @@ async function main() {
   pikachu.useAttack(84);
   pikachu.useAttack(84);
   pikachu.useAttack(84);
-  pikachu.useAttack(84);
 }
 
 main();

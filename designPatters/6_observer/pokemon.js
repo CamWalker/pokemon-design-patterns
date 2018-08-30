@@ -66,9 +66,8 @@ class Pokemon {
         
         ${attack.type === this.type ? "It's super effective!" : ''}
       `);
-
       _.forEach(this.attackObservers, (pokemon) => {
-        pokemon.receiveAttack(attack);
+        pokemon.receiveAttack(attack, this);
       })
     } else {
       console.log(`
@@ -123,27 +122,26 @@ class Pokemon {
 
   fight(pokemon) {
     this.attackObservers.push(pokemon);
-    console.log(`${this.name} is now fighting ${pokemon.name}`)
+    console.log(`${this.name} is fighting ${pokemon.name}`);
   }
 
-  receiveAttack(attack) {
-    const power = _.get(attack, 'power', 0);
-    if (power) {
-      this.hp -= power;
-      console.log(`${this.name} took ${power} damage`)
+  removeAttackObserver(pokemon) {
+    this.attackObservers = _.filter(this.attackObservers, pokemonObserver => {
+      return pokemonObserver.id !== pokemon.id;
+    })
+    console.log(`${this.name} has stopped fighting ${pokemon.name}`);
+  }
+
+  receiveAttack(attack, pokemon) {
+    // lose hp
+    if (attack.power) {
+      this.hp -= attack.power;
+      console.log(`${this.name} received ${attack.power} damage`);
     }
     if (this.hp <= 0) {
-      console.log(`${this.name} is unable to battle`)
-      _.forEach(this.attackObservers, (pokemon) => {
-        this.stopFighting(pokemon);
-        pokemon.stopFighting(this);
-      })
+      console.log(`${this.name} is unable to battle, ${pokemon.name} wins!`);
+      pokemon.removeAttackObserver(this);
     }
-  }
-
-  stopFighting(pokemon) {
-    this.attackObservers = _.filter(this.attackObservers, (pokemonObserver) => (pokemonObserver.id !== pokemon.id));
-    console.log(`${pokemon.name} stopped fighting with ${this.name}`);
   }
 }
 
