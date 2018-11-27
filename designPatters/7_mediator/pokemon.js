@@ -1,6 +1,6 @@
 const _ = require('lodash');
-const PokeApi = require('../6_observer/pokeApi.service.js');
-const fightMediator = require('./fightMediator');
+const PokeApi = require('./pokeApi.service.js');
+const mediator = require('./fightMediator');
 
 class Attack {
   constructor(data) {
@@ -26,7 +26,6 @@ class Pokemon {
     // this.levelUpMoves = {};
     this.attacks = {};
     this.pranks = {};
-    // this.attackObservers = [];
   }
 
   async create() {
@@ -67,10 +66,7 @@ class Pokemon {
         
         ${attack.type === this.type ? "It's super effective!" : ''}
       `);
-      // _.forEach(this.attackObservers, (pokemon) => {
-      //   pokemon.receiveAttack(attack, this);
-      // })
-      fightMediator.useAttack(attack, this.name);
+      mediator.receiveAttack(attack, this.name);
     } else {
       console.log(`
         "${this.name}?"
@@ -122,18 +118,6 @@ class Pokemon {
     }
   }
 
-  // fight(pokemon) {
-  //   this.attackObservers.push(pokemon);
-  //   console.log(`${this.name} is fighting ${pokemon.name}`);
-  // }
-
-  // removeAttackObserver(pokemon) {
-  //   this.attackObservers = _.filter(this.attackObservers, pokemonObserver => {
-  //     return pokemonObserver.id !== pokemon.id;
-  //   })
-  //   console.log(`${this.name} has stopped fighting ${pokemon.name}`);
-  // }
-
   receiveAttack(attack) {
     // lose hp
     if (attack.power) {
@@ -141,7 +125,7 @@ class Pokemon {
       console.log(`${this.name} received ${attack.power} damage`);
     }
     if (this.hp <= 0) {
-      fightMediator.stopFighting(this.name)
+      mediator.execute('stopFighting', this.name)
     }
   }
 }
